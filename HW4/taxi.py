@@ -57,7 +57,8 @@ class Agent():
             None (Don't need to return anything)
         """
         # Begin your code
-        self.qtable[state][action] += self.learning_rate * (reward + self.gamma * np.max(self.qtable[next_state, :]) - self.qtable[state][action]) 
+        # TODO
+        self.qtable[state][action] += self.learning_rate * (reward + self.gamma * np.max(self.qtable[next_state]) - self.qtable[state][action]) 
         # End your code
         np.save("./Tables/taxi_table.npy", self.qtable)
 
@@ -72,6 +73,7 @@ class Agent():
             max_q: the max Q value of given state
         """
         # Begin your code
+        # TODO
         return np.max(self.qtable[state])
         # End your code
 
@@ -106,7 +108,7 @@ def train(env):
     episode = 3000
     rewards = []
     for ep in tqdm(range(episode)):
-        state = env.reset()[0]
+        state = env.reset()[0] # Change the original code
         done = False
 
         count = 0
@@ -140,7 +142,7 @@ def test(env):
     rewards = []
 
     for _ in range(100):
-        state = testing_agent.env.reset()[0]
+        state = testing_agent.env.reset()[0] # Change the original code
         count = 0
         while True:
             action = np.argmax(testing_agent.qtable[state])
@@ -164,7 +166,7 @@ if __name__ == "__main__":
     os.makedirs("./Tables", exist_ok=True)
 
     # training section:
-    for i in range(1):
+    for i in range(5):
         print(f"#{i + 1} training progress")
         train(env)   
     # testing section:
