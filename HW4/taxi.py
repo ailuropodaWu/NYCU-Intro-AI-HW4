@@ -108,13 +108,13 @@ def train(env):
     episode = 3000
     rewards = []
     for ep in tqdm(range(episode)):
-        state = env.reset()[0] # Change the original code
+        state = env.reset()
         done = False
 
         count = 0
         while True:
             action = training_agent.choose_action(state)
-            next_state, reward, done, _, trash = env.step(action)
+            next_state, reward, done, _ = env.step(action)
             training_agent.learn(state, action, reward, next_state, done)
             count += reward
 
@@ -142,11 +142,11 @@ def test(env):
     rewards = []
 
     for _ in range(100):
-        state = testing_agent.env.reset()[0] # Change the original code
+        state = testing_agent.env.reset()
         count = 0
         while True:
             action = np.argmax(testing_agent.qtable[state])
-            next_state, reward, done, _, trash = testing_agent.env.step(action)
+            next_state, reward, done, _ = testing_agent.env.step(action)
             count += reward
             if done == True:
                 rewards.append(count)
