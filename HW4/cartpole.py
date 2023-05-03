@@ -134,7 +134,7 @@ class Agent():
         if not done:
             self.qtable[tuple(state)][action] += self.learning_rate * self.gamma * np.max(self.qtable[tuple(next_state)])
         # End your code
-        np.save("./Tables/cartpole_table.npy", self.qtable)
+        #np.save("./Tables/cartpole_table.npy", self.qtable)
 
     def check_max_Q(self):
         """
