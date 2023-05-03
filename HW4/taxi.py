@@ -40,8 +40,7 @@ class Agent():
         """
         # Begin your code
         # TODO
-        exp = random.uniform(0, 1)
-        if exp > self.epsilon:
+        if random.uniform(0, 1) > self.epsilon:
             return np.argmax(self.qtable[state])
         else:
             return self.env.action_space.sample()
@@ -63,7 +62,9 @@ class Agent():
         """
         # Begin your code
         # TODO
-        self.qtable[state][action] += self.learning_rate * (reward + self.gamma * np.max(self.qtable[next_state]) - self.qtable[state][action]) 
+        self.qtable[state][action] += self.learning_rate * (reward - self.qtable[state][action]) 
+        if not done:
+            self.qtable[state][action] += self.learning_rate * self.gamma * np.max(self.qtable[next_state])
         # End your code
         np.save("./Tables/taxi_table.npy", self.qtable)
 
