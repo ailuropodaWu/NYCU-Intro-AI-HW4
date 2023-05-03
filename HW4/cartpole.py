@@ -55,12 +55,7 @@ class Agent():
         """
         # Begin your code
         # TODO
-        ret = list()
-        gap = (upper_bound - lower_bound) / num_bins
-        for i in range(num_bins - 1):
-            lower_bound += gap
-            ret.append(lower_bound)
-        return np.array(ret)
+        return np.linspace(lower_bound, upper_bound, num_bins)[1:-1]
         # End your code
 
     def discretize_value(self, value, bins):
@@ -79,14 +74,7 @@ class Agent():
         """
         # Begin your code
         # TODO
-        if value < bins[0]:
-            return 0
-        elif value > bins[-1]:
-            return len(bins)
-        else:
-            for i in range(len(bins) - 1):
-                if value >= bins[i] and value < bins[i+1]:
-                    return i + 1
+        return np.digitize(value, bins)
         # End your code
 
     def discretize_observation(self, observation):
@@ -121,9 +109,8 @@ class Agent():
         """
         # Begin your code
         # TODO
-        explore = random.uniform(0, 1)
-        if explore > self.epsilon:
-            return np.argmax(self.qtable[state[0]][state[1]][state[2]][state[3]])
+        if random.uniform(0, 1) > self.epsilon:
+            return np.argmax(self.qtable[tuple(state)])
         else:
             return self.env.action_space.sample()
         # End your code
@@ -142,7 +129,10 @@ class Agent():
         """
         # Begin your code
         # TODO
-        self.qtable[state[0]][state[1]][state[2]][state[3]][action] += self.learning_rate * (reward + self.gamma * np.max(self.qtable[next_state[0]][next_state[1]][next_state[2]][next_state[3]]) - self.qtable[state[0]][state[1]][state[2]][state[3]][action]) 
+        
+        self.qtable[tuple(state)][action] += self.learning_rate * (reward - self.qtable[tuple(state)][action])
+        if not done:
+            self.qtable[tuple(state)][action] += self.learning_rate * self.gamma * np.max(self.qtable[tuple(next_state)])
         # End your code
         np.save("./Tables/cartpole_table.npy", self.qtable)
 
