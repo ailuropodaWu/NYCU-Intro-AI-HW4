@@ -2,6 +2,7 @@ import numpy as np
 import os
 import gym
 from tqdm import tqdm
+import random
 
 total_reward = []
 
@@ -39,7 +40,11 @@ class Agent():
         """
         # Begin your code
         # TODO
-        return np.argmax(self.qtable[state])
+        exp = random.uniform(0, 1)
+        if exp > self.epsilon:
+            return np.argmax(self.qtable[state])
+        else:
+            return self.env.action_space.sample()
         # End your code
 
     def learn(self, state, action, reward, next_state, done):
