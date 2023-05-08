@@ -79,7 +79,7 @@ class Net(nn.Module):
 
 
 class Agent():
-    def __init__(self, env, epsilon=0.95, learning_rate=0.0002, GAMMA=0.97, batch_size=32, capacity=10000):
+    def __init__(self, env, epsilon=0.05, learning_rate=0.0002, GAMMA=0.97, batch_size=32, capacity=10000):
         """
         The agent learning how to control the action of the cart pole.
         Hyperparameters:
@@ -132,9 +132,25 @@ class Agent():
 
         # Begin your code
         # TODO
-        raise NotImplementedError("Not implemented yet.")
+        observations, actions, rewards, next_observations, done = self.buffer.sample(self.batch_size)
+
+        observations = torch.FloatTensor(observations)
+        actions = torch.LongTensor(actions)
+        rewards = torch.FloatTensor(rewards)
+        next_observations = torch.FloatTensor(np.array(next_observations))
+        done = torch.BoolTensor(done)
+        
+        evaluate = self.evaluate_net(observations).gather(1, actions.reshape(self.batch_size, 1))
+        nextMax = self.target_net(next_observations).detach()
+        target = rewards.reshape(self.batch_size, 1) + self.gamma * nextMax.max(1)[0].view(self.batch_size, 1) * (~done).reshape(self.batch_size, 1)
+
+        MSE = nn.MSELoss()
+        loss = MSE(evaluate, target)
+        self.optimizer.zero_grad()
+        loss.backward()
+        self.optimizer.step()
         # End your code
-        torch.save(self.target_net.state_dict(), "./Tables/DQN.pt")
+        # torch.save(self.target_net.state_dict(), "./Tables/DQN.pt")
 
     def choose_action(self, state):
         """
@@ -151,9 +167,12 @@ class Agent():
         with torch.no_grad():
             # Begin your code
             # TODO
-            raise NotImplementedError("Not implemented yet.")
+            if random.uniform(0, 1) > self.epsilon:
+                action = torch.argmax(self.evaluate_net.forward(torch.FloatTensor(state))).item()
+            else:
+                action = self.env.action_space.sample()
             # End your code
-        return action
+            return action
 
     def check_max_Q(self):
         """
@@ -168,7 +187,7 @@ class Agent():
         """
         # Begin your code
         # TODO
-        raise NotImplementedError("Not implemented yet.")
+        return torch.max(self.target_net(torch.FloatTensor(self.env.reset())))
         # End your code
 
 
@@ -193,13 +212,15 @@ def train(env):
             action = agent.choose_action(state)
             next_state, reward, done, _ = env.step(action)
             agent.buffer.insert(state, int(action), reward, next_state, int(done))
-            
+
             if len(agent.buffer) >= 1000:
                 agent.learn()
             if done:
                 rewards.append(count)
                 break
             state = next_state
+    
+    torch.save(agent.target_net.state_dict(), "./Tables/DQN.pt")
     total_rewards.append(rewards)
 
 
