@@ -132,16 +132,16 @@ class Agent():
 
         # Begin your code
         # TODO
-        observations, actions, rewards, next_observations, done = self.buffer.sample(self.batch_size)
+        state, actions, rewards, next_state, done = self.buffer.sample(self.batch_size)
 
-        observations = torch.FloatTensor(observations)
+        state = torch.FloatTensor(state)
         actions = torch.LongTensor(actions)
         rewards = torch.FloatTensor(rewards)
-        next_observations = torch.FloatTensor(np.array(next_observations))
+        next_state = torch.FloatTensor(np.array(next_state))
         done = torch.BoolTensor(done)
         
-        evaluate = self.evaluate_net(observations).gather(1, actions.reshape(self.batch_size, 1))
-        nextMax = self.target_net(next_observations).detach()
+        evaluate = self.evaluate_net(state).gather(1, actions.reshape(self.batch_size, 1))
+        nextMax = self.target_net(next_state).detach()
         target = rewards.reshape(self.batch_size, 1) + self.gamma * nextMax.max(1)[0].view(self.batch_size, 1) * (~done).reshape(self.batch_size, 1)
 
         MSE = nn.MSELoss()
