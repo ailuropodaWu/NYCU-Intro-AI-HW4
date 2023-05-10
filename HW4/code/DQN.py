@@ -132,6 +132,7 @@ class Agent():
 
         # Begin your code
         # TODO
+        
         state, actions, rewards, next_state, done = self.buffer.sample(self.batch_size)
 
         state = torch.FloatTensor(state)
