@@ -104,7 +104,7 @@ class Agent():
         self.target_net = Net(self.n_actions)  # the target network
 
         self.optimizer = torch.optim.Adam(
-            self.evaluate_net.parameters(), lr=self.learning_rate)  # Adam is a method using to optimize the neural network
+        self.evaluate_net.parameters(), lr=self.learning_rate)  # Adam is a method using to optimize the neural network
 
     def learn(self):
         '''
@@ -150,7 +150,7 @@ class Agent():
         loss.backward()
         self.optimizer.step()
         # End your code
-        # torch.save(self.target_net.state_dict(), "./Tables/DQN.pt")
+        torch.save(self.target_net.state_dict(), "./Tables/DQN.pt")
 
     def choose_action(self, state):
         """
