@@ -70,7 +70,7 @@ class Agent():
         Qopt(s, a) <- (1 - learnig_rate) * Qopt(s, a) + learning_rate(reward + gamma * max(Qopt(s'))) =>
         Qopt(s, a) += learning_rate * (reward - Qopt(s, a) + [(if done) gamma * max(Qopt(s'))])
         """
-        self.qtable[state][action] += self.learning_rate * (reward - self.qtable[state][action] + self.gamma * np.max(self.qtable[next_state])) 
+        self.qtable[state][action] += self.learning_rate * (reward - self.qtable[state][action] + (~done) * self.gamma * np.max(self.qtable[next_state])) 
         
         # End your code
         np.save("./Tables/taxi_table.npy", self.qtable)
