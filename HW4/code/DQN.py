@@ -132,21 +132,21 @@ class Agent():
 
         # Begin your code
         # TODO
-        
+
         state, actions, rewards, next_state, done = self.buffer.sample(self.batch_size)
 
-        state = torch.FloatTensor(state)
         actions = torch.LongTensor(actions)
         rewards = torch.FloatTensor(rewards)
-        next_state = torch.FloatTensor(np.array(next_state))
         done = torch.BoolTensor(done)
-        
-        evaluate = self.evaluate_net(state).gather(1, actions.reshape(self.batch_size, 1))
-        nextMax = self.target_net(next_state).detach()
-        target = rewards.reshape(self.batch_size, 1) + self.gamma * nextMax.max(1)[0].view(self.batch_size, 1) * (~done).reshape(self.batch_size, 1)
 
-        MSE = nn.MSELoss()
-        loss = MSE(evaluate, target)
+        qEvaluate = self.evaluate_net(torch.FloatTensor(np.array(state)))
+        evaluate = [qEvaluate[i][actions[i]] for i in range(self.batch_size)]
+        qTarget = [torch.max(i) for i in self.target_net(torch.FloatTensor(np.array(next_state)))]
+        target = [rewards[i] +self.gamma * qTarget[i] * (~done[i]) for i in range(self.batch_size)]
+        loss = torch.tensor(0., dtype=torch.float32)
+        for i in range(self.batch_size):
+            loss += (evaluate[i] - target[i]) ** 2 / self.batch_size
+            
         self.optimizer.zero_grad()
         loss.backward()
         self.optimizer.step()
@@ -169,11 +169,11 @@ class Agent():
             # Begin your code
             # TODO
             if random.uniform(0, 1) > self.epsilon:
-                action = torch.argmax(self.evaluate_net.forward(torch.FloatTensor(state))).item()
+                return torch.argmax(self.evaluate_net(torch.FloatTensor(state))).item()
             else:
-                action = self.env.action_space.sample()
+                return self.env.action_space.sample()
             # End your code
-            return action
+            
 
     def check_max_Q(self):
         """
