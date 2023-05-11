@@ -39,7 +39,12 @@ class Agent():
             action: The action to be evaluated.
         """
         # Begin your code
-        # TODO
+        """.
+        Returns:
+            Determined by a random number between 0 and 1
+            1. If the number > epsilon, do the exploitation
+            2. Otherwise, do the exploration
+        """
         if random.uniform(0, 1) > self.epsilon:
             return np.argmax(self.qtable[state])
         else:
@@ -61,10 +66,12 @@ class Agent():
             None (Don't need to return anything)
         """
         # Begin your code
-        # TODO
-        self.qtable[state][action] += self.learning_rate * (reward - self.qtable[state][action]) 
-        if not done:
-            self.qtable[state][action] += self.learning_rate * self.gamma * np.max(self.qtable[next_state])
+        """
+        Qopt(s, a) <- (1 - learnig_rate) * Qopt(s, a) + learning_rate(reward + gamma * max(Qopt(s'))) =>
+        Qopt(s, a) += learning_rate * (reward - Qopt(s, a) + [(if done) gamma * max(Qopt(s'))])
+        """
+        self.qtable[state][action] += self.learning_rate * (reward - self.qtable[state][action] + self.gamma * np.max(self.qtable[next_state])) 
+        
         # End your code
         np.save("./Tables/taxi_table.npy", self.qtable)
 
@@ -79,7 +86,9 @@ class Agent():
             max_q: the max Q value of given state
         """
         # Begin your code
-        # TODO
+        """
+        Return the max value from differents actions of the state
+        """
         return np.max(self.qtable[state])
         # End your code
 
@@ -129,7 +138,6 @@ def train(env):
                 break
 
             state = next_state
-
     total_reward.append(rewards)
 
 
