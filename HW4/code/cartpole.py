@@ -143,12 +143,13 @@ class Agent():
         Qopt(s, a) <- (1 - learnig_rate) * Qopt(s, a) + learning_rate(reward + gamma * max(Qopt(s'))) =>
         Qopt(s, a) += learning_rate * (reward - Qopt(s, a) + [(if done) gamma * max(Qopt(s'))])
         """
-        
-        self.qtable[tuple(state)][action] += self.learning_rate * (reward - self.qtable[tuple(state)][action])
-        if not done:
-            self.qtable[tuple(state)][action] += self.learning_rate * self.gamma * np.max(self.qtable[tuple(next_state)])
+        if done:
+            nextq = 0
+        else:
+            nextq = self.gamma * np.max(self.qtable[tuple(next_state)])
+        self.qtable[tuple(state)][action] += self.learning_rate * (reward - self.qtable[tuple(state)][action] + nextq)
         # End your code
-        #np.save("./Tables/cartpole_table.npy", self.qtable)
+        np.save("./Tables/cartpole_table.npy", self.qtable)
 
     def check_max_Q(self):
         """
