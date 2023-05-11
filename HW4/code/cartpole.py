@@ -54,7 +54,9 @@ class Agent():
             1. This can be done with a numpy function.
         """
         # Begin your code
-        # TODO
+        """
+        Use the linspace function to slice the array
+        """
         return np.linspace(lower_bound, upper_bound, num_bins)[1:-1]
         # End your code
 
@@ -73,7 +75,9 @@ class Agent():
             1. This can be done with a numpy function.
         """
         # Begin your code
-        # TODO
+        """
+        Use the digitize function to determine that the value is in which interval of the bins
+        """
         return np.digitize(value, bins)
         # End your code
 
@@ -94,7 +98,9 @@ class Agent():
             3. You might find something useful in Agent.__init__()
         """
         # Begin your code
-        # TODO
+        """
+        Make the continuous state become a discretize data
+        """
         return [self.discretize_value(observation[i], self.bins[i]) for i in range(len(observation))]
         # End your code
 
@@ -108,7 +114,12 @@ class Agent():
             action: The action to be evaluated.
         """
         # Begin your code
-        # TODO
+        """
+        Returns:
+            Determined by a random number between 0 and 1
+            1. If the number > epsilon, do the exploitation
+            2. Otherwise, do the exploration
+        """
         if random.uniform(0, 1) > self.epsilon:
             return np.argmax(self.qtable[tuple(state)])
         else:
@@ -128,7 +139,10 @@ class Agent():
             None (Don't need to return anything)
         """
         # Begin your code
-        # TODO
+        """
+        Qopt(s, a) <- (1 - learnig_rate) * Qopt(s, a) + learning_rate(reward + gamma * max(Qopt(s'))) =>
+        Qopt(s, a) += learning_rate * (reward - Qopt(s, a) + [(if done) gamma * max(Qopt(s'))])
+        """
         
         self.qtable[tuple(state)][action] += self.learning_rate * (reward - self.qtable[tuple(state)][action])
         if not done:
@@ -148,7 +162,9 @@ class Agent():
             max_q: the max Q value of initial state(self.env.reset())
         """
         # Begin your code
-        # TODO
+        """
+        Return the max value from differents actions of the discretized state
+        """
         return np.max(self.qtable[self.discretize_observation(self.env.reset())])
         # End your code
 
