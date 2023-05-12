@@ -131,22 +131,26 @@ class Agent():
             self.target_net.load_state_dict(self.evaluate_net.state_dict())
 
         # Begin your code
-        # TODO
-
+        """
+        Calculate the MSE loss between the evaluate value and the target value.
+            evaluate = the Q value evaluated by the evaluate_net
+            target = reward + [(if not done) gamma * max Q value from the target_net]
+        """
         state, actions, rewards, next_state, done = self.buffer.sample(self.batch_size)
 
-        actions = torch.LongTensor(actions)
-        rewards = torch.FloatTensor(rewards)
+        #rewards = torch.FloatTensor(rewards)
         done = torch.BoolTensor(done)
 
         qEvaluate = self.evaluate_net(torch.FloatTensor(np.array(state)))
         evaluate = [qEvaluate[i][actions[i]] for i in range(self.batch_size)]
+
         qTarget = [torch.max(i) for i in self.target_net(torch.FloatTensor(np.array(next_state)))]
-        target = [rewards[i] +self.gamma * qTarget[i] * (~done[i]) for i in range(self.batch_size)]
+        target = [rewards[i] + (~done[i]) * self.gamma * qTarget[i] for i in range(self.batch_size)]
+
         loss = torch.tensor(0., dtype=torch.float32)
         for i in range(self.batch_size):
             loss += (evaluate[i] - target[i]) ** 2 / self.batch_size
-            
+
         self.optimizer.zero_grad()
         loss.backward()
         self.optimizer.step()
@@ -167,7 +171,12 @@ class Agent():
         """
         with torch.no_grad():
             # Begin your code
-            # TODO
+            """
+            Returns:
+                Determined by a random number between 0 and 1
+                1. If the number > epsilon, do the exploitation
+                2. Otherwise, do the exploration
+            """
             if random.uniform(0, 1) > self.epsilon:
                 return torch.argmax(self.evaluate_net(torch.FloatTensor(state))).item()
             else:
@@ -187,7 +196,9 @@ class Agent():
             max_q: the max Q value of initial state(self.env.reset())
         """
         # Begin your code
-        # TODO
+        """
+        Return the max value from differents actions of the state
+        """
         return torch.max(self.target_net(torch.FloatTensor(self.env.reset())))
         # End your code
 
@@ -259,7 +270,7 @@ if __name__ == "__main__":
     os.makedirs("./Tables", exist_ok=True)
 
     # training section:
-    for i in range(5):
+    for i in range(1):
         print(f"#{i + 1} training progress")
         train(env)
         

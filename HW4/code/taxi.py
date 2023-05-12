@@ -68,7 +68,7 @@ class Agent():
         # Begin your code
         """
         Qopt(s, a) <- (1 - learnig_rate) * Qopt(s, a) + learning_rate(reward + gamma * max(Qopt(s'))) =>
-        Qopt(s, a) += learning_rate * (reward - Qopt(s, a) + [(if done) gamma * max(Qopt(s'))])
+        Qopt(s, a) += learning_rate * (reward - Qopt(s, a) + [(if not done) gamma * max(Qopt(s'))])
         """
         if done:
             nextq = 0
