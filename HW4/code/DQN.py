@@ -133,19 +133,17 @@ class Agent():
         # Begin your code
         """
         Calculate the MSE loss between the evaluate value and the target value.
+        Variables:
             evaluate = the Q value evaluated by the evaluate_net
             target = reward + [(if not done) gamma * max Q value from the target_net]
         """
         state, actions, rewards, next_state, done = self.buffer.sample(self.batch_size)
 
-        #rewards = torch.FloatTensor(rewards)
-        done = torch.BoolTensor(done)
-
         qEvaluate = self.evaluate_net(torch.FloatTensor(np.array(state)))
         evaluate = [qEvaluate[i][actions[i]] for i in range(self.batch_size)]
 
         qTarget = [torch.max(i) for i in self.target_net(torch.FloatTensor(np.array(next_state)))]
-        target = [rewards[i] + (~done[i]) * self.gamma * qTarget[i] for i in range(self.batch_size)]
+        target = [rewards[i] + (1 - done[i]) * self.gamma * qTarget[i] for i in range(self.batch_size)]
 
         loss = torch.tensor(0., dtype=torch.float32)
         for i in range(self.batch_size):
@@ -270,7 +268,7 @@ if __name__ == "__main__":
     os.makedirs("./Tables", exist_ok=True)
 
     # training section:
-    for i in range(1):
+    for i in range(5):
         print(f"#{i + 1} training progress")
         train(env)
         
